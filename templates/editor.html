@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}reMarkable - {{ notebook.title }}{% endblock %}
+{% block page_css_and_js %}
+    <script type="text/JavaScript" src="{{ url_for('static', filename='js/general.js') }}"></script>
+    <script type="text/JavaScript" src="{{ url_for('static', filename='js/editor.js') }}" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
+    <style>
+        .ql-container {
+            font-size: 18px;
+        }
+        
+        .toolbar:nth-child(2) {
+            z-index: 30;
+        }
+
+        .ql-editor {
+            overflow-y: hidden;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="container" data-id="{{ notebook.id }}" data-contents="{{ data_contents }}">
+    <div class="bar">
+        <div class="bar-left">
+            <a class="backButton" href="/">
+                <img src="{{ url_for('static', filename='resources/images/icons/notebook.png') }}" alt="Back">
+            </a>
+            <input class="notebookTitle" type="text" value="{{ notebook.title }}">
+        </div>
+        <div class="last-edited">
+            <p>Last edited on <span>{{ notebook.last_edited }}</span></p>
+        </div>
+    </div>
+    <div id="editor">      
+    </div>    
+</div>
+
+<!-- Include the Quill library -->
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/scrapooo/quill-resize-module@1.0.2/dist/quill-resize-module.js"></script>
+{% endblock %}

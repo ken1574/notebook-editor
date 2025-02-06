@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+{% block title %}reMarkable - User Profile{% endblock %}
+{% block page_css_and_js %}
+    <link rel="stylesheet" href="css/user_profile.css">
+    <script type="text/JavaScript" src="js/user_profile.js"></script> 
+{% endblock %}
+{% block content %}
+<style>
+    p {
+        margin: 0;
+    }
+</style>
+<div class="container" data-current_user_id="{{ current_user_id }}">
+    <div class="create-notebook-model" id="create-notebook-model">
+        <form id="create-notebook-form" method="POST" action="/">
+            <button id="close-model" class="close-model" type="button" onclick="closeModel()">
+                <img src="resources/images/icons/close.png" alt="close">
+            </button>
+            <h3 id="form-type">Create Notebook</h3>
+            <div class="form-container">
+                    <p>Notebook Cover:</p>
+                    <div class="ntbk-cover-btns">
+                        <button type="button" id="open-img-ctn-btn" class="open-img-ctn-btn hvr1" onclick="openImageContainer()">Choose from gallery</button>
+                        <div id="edit-cover" class="edit-cover" >
+                            <img alt="No Cover Chosen">
+                            <button type="button" class="hvr1" onclick="openImageContainer()">Edit</button>
+                        </div>
+                   
+                    </div>
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" required>
+                    <label for="topic">Topic:</label>
+                    <select id="topic" name="topic">
+                        <option value="Math">Math</option>
+                        <option value="Science">Science</option>
+                        <option value="History">History</option>
+                        <option value="English">English</option>
+                        <option value="Art">Art</option>
+                        <option value="Music">Music</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Geography">Geography</option>
+                        <option value="Foreign Language">Foreign Language</option>
+                        <option value="Others">Others</option>
+                    </select>
+      
+            </div>
+            <div class="image-container" id="image-container">
+                <h2>Choose a cover:</h2>
+                <label class="custom-upload hvr1" for="upload-cover-input">Upload from Computer</label>
+                <input type="file" accept="image/*" class="upload-cover" id="upload-cover-input">
+                <img class="cover-preview" id="cover-preview">
+
+                <div class="image-container-grid">
+                    <label class="image-option">
+                        <input type="radio" name="selectedCover" value="resources/images/covers/default/1.jpg">
+                        <img src="resources/images/covers/default/1.jpg" alt="Picture 1">
+                    </label>
+                    <label class="image-option">
+                        <input type="radio" name="selectedCover" value="resources/images/covers/default/2.jpg">
+                        <img src="resources/images/covers/default/2.jpg" alt="Picture 2">
+                    </label>
+                    <label class="image-option">
+                        <input type="radio" name="selectedCover" value="resources/images/covers/default/3.jpg">
+                        <img src="resources/images/covers/default/3.jpg" alt="Picture 3">
+                    </label>
+                    <label class="image-option">
+                        <input type="radio" name="selectedCover" value="resources/images/covers/default/4.jpg">
+                        <img src="resources/images/covers/default/4.jpg" alt="Picture 4">
+                    </label>
+                    <label class="image-option">
+                        <input type="radio" name="selectedCover" value="resources/images/covers/default/5.jpg">
+                        <img src="resources/images/covers/default/5.jpg" alt="Picture 5">
+                    </label>
+                </div>
+                <button type="button" class="close-img-ctn-btn hvr1" id="close-img-ctn-btn" onclick="closeImageContainer()">Done</button>
+            </div>
+            <button class="create-notebook-button hvr1" type="submit">Create</button>
+        </form>
+    </div>
+    <!-- Sidebar -->
+    <div class="sidebar bar">
+        <h1>Welcome, {{ current_username }}!</h1>
+        <img src="" alt="User Avatar">
+        <p>@yumyum</p>
+        <div class="tabs">
+            <button class="hvr1 current-tab" onclick="showTab('Dashboard')">Dashboard</button>
+            <button class="hvr1" onclick="showTab('Favourites')">Favourites</button>
+            <button class="hvr1" onclick="showTab('Trash')">Trash</button>
+        </div>
+        <div class="sidebar-bottom">
+            <button class="hvr1 tabs-settings" onclick="showTab('Settings')">Settings</button>
+            <div class="storage">
+                <p>0.01GB of 5GB used</p>
+                <div class="progress-bar">
+                    <div class="progress"></div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="notif" id="notif">
+            <p id="notif-text"></p>
+        </div>
+        <!-- Top Bar -->
+        <div class="top-bar bar">
+            <div class="user-info">
+                <div>
+                    <p>Notebooks</p>
+                    <strong id="notebook-count">{{ notebook_count }}</strong>
+                </div>
+                <div>
+                    <p>Followers</p>
+                    <strong>0</strong>
+                </div>
+                <div>
+                    <p>Following</p>
+                    <strong>0</strong>
+                </div>
+                <button class="back-to-community-btn hvr1">Back to Community</button>
+            </div>
+        </div>
+
+        <div class="bottom-bar bar">
+            <!-------------------------------------- DASHBOARD TAB -------------------------------------->
+            <div id="Dashboard-tab" class="tab-content dashboard-tab">
+                <div class="banner">
+                    <div>
+                        <h2>Dashboard</h2>
+                        <h3>Recent Works</h3>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="Search items...">
+                </div>
+                <div class="notebooks-grid dashboard">
+                    <div class="add-notebook">
+                        <div onclick="openModel()">
+                            <button class="add-notebook-button">
+                                <img src="resources/images/icons/add.png" alt="add">
+                            </button>
+                        </div>
+                    </div> 
+                    {% for notebook in dashboard_notebooks %}
+                    <div class="notebook-card" 
+                    data-id="{{ notebook.id }}"
+                    data-creator_id="{{ notebook.creator_id}}"
+                    data-creator_username="{{ notebook.creator_username }}"
+                    data-title="{{ notebook.title }}" 
+                    data-topic="{{ notebook.topic }}"
+                    data-favourited="{{ notebook.favourited }}"
+                    style="background-image: url('{{ notebook.cover }}');">
+                        <a class="anchor" href="/editor/{{ notebook.id }}"></a>
+                        <div class="notebook-card-header">
+                            <p class="title">{{ notebook.title }}</p>
+                            <div class="notebook-card-options">
+                                <div data-button="favourites" class="favourites">
+                                    <img src="{{ notebook.favouriteState }}" alt="favourites">
+                                    <p>{{ notebook.favourites }}</p>
+                                </div>
+                                <div data-button="downloads" class="downloads">
+                                    <img src="resources/images/icons/downloads.png" alt="downloads">
+                                    <p>{{ notebook.downloads }}</p>
+                                </div>
+                                <div class="more">
+                                    <img src="resources/images/icons/more.png" alt="more">
+                                    <div class="more-dropdown">
+                                        <a>Created by: {{ notebook.creator_username }}</a>
+                                        <a>Edit</a>
+                                        <a>Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <!-- <div class="notebook-card" data-id="ID">
+                        <div class="notebook-card-header">
+                            <p class="title">TITLE</p>
+                           
+                            <div class="notebook-card-options">
+                                <div class="favourites">
+                                    <img src="resources/images/heart.png" alt="favourites">
+                                    <p>#</p>
+                                </div>
+                                <div class="downloads">
+                                    <img src="resources/images/downloads.png" alt="downloads">
+                                    <p>#</p>
+                                </div>
+                                <div class="more">
+                                    <img src="resources/images/more.png" alt="more">
+                                    <div class="more-dropdown">
+                                        <a>Created by:</a>
+                                        <a>Rename</a>
+                                        <a>Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+
+                        
+                </div>
+            </div>
+
+              <!---------------------------------- FAVOURITES TAB ---------------------------------->
+            <div id="Favourites-tab" class="tab-content">
+                <div class="banner">
+                    <h2>Favourites</h2>
+                </div>
+                <div class="notebooks-grid favourites-grid">
+                    {% for notebook in favourite_notebooks %}
+                    <div class="notebook-card" 
+                    data-id="{{ notebook.id }}"
+                    data-creator_id="{{ notebook.creator_id}}"
+                    data-creator_username="{{ notebook.creator_username }}"
+                    data-title="{{ notebook.title }}" 
+                    data-topic="{{ notebook.topic }}"
+                    data-favourited="{{ notebook.favourited }}" 
+                    style="background-image: url('{{ notebook.cover }}');">
+                        <div class="notebook-card-header">
+                            <p class="title">{{ notebook.title }}</p>
+                            <div class="notebook-card-options">
+                                <div data-button="favourites" class="favourites">
+                                    <img src="{{ notebook.favouriteState }}" alt="favourites">
+                                    <p>{{ notebook.favourites }}</p>
+                                </div>
+                                <div data-button="downloads" class="downloads">
+                                    <img src="resources/images/icons/downloads.png" alt="downloads">
+                                    <p>{{ notebook.downloads }}</p>
+                                </div>
+                                <div class="more">
+                                    <img src="resources/images/icons/more.png" alt="more">
+                                    <div class="more-dropdown">
+                                        <a>Created by: {{ notebook.creator_username }}</a>
+                                        <a>Edit</a>
+                                        <a>Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}   
+                </div>
+            </div>
+
+            <!-------------------------------------- TRASH TAB -------------------------------------->
+            <div id="Trash-tab" class="tab-content">
+                <div class="banner">
+                    <h2>Trash</h2>
+                </div>
+                <button id="delete-all-button" class="delete-all-button hvr1">Delete All</button>
+                <div class="notebooks-grid trash">
+                    {% for notebook in trash_notebooks %}
+                    <div class="notebook-card" 
+                    data-id="{{ notebook.id }}"
+                    data-creator_id="{{ notebook.creator_id}}"
+                    data-creator_username="{{ notebook.creator_username }}"
+                    data-title="{{ notebook.title }}" 
+                    data-topic="{{ notebook.topic }}"
+                    data-favourited="{{ notebook.favourited }}" 
+                    style="background-image: url('{{ notebook.cover }}');">
+                        <div class="notebook-card-header">
+                            <p class="title">{{ notebook.title }}</p>
+                            <div class="notebook-card-options">
+                                <div data-button="favourites" class="favourites">
+                                    <img src="{{ notebook.favouriteState }}" alt="favourites">
+                                    <p>{{ notebook.favourites }}</p>
+                                </div>
+                                <div data-button="downloads" class="downloads">
+                                    <img src="resources/images/icons/downloads.png" alt="downloads">
+                                    <p>{{ notebook.downloads }}</p>
+                                </div>
+                                <div class="more">
+                                    <img src="resources/images/icons/more.png" alt="more">
+                                    <div class="more-dropdown">
+                                        <a>Created by: {{ notebook.creator_username }}</a>
+                                        <a>Restore</a>
+                                        <a>Delete Forever</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}   
+                </div>
+            </div>
+
+
+
+
+            <div id="Settings-tab" class="tab-content">
+                <div class="banner">
+                    <h2>Settings</h2>
+                </div>
+                <div class="download-upload-notebooks">
+                    <a class="hvr1" href="/download_json_zip">Backup Notebooks</a>
+                    
+                    <form id="upload_form" action="/upload_json" method="POST" enctype="multipart/form-data">
+                        <label class="hvr1" for="notebooks_upload">Upload Notebooks</label>
+                        <input id="notebooks_upload" type="file" name="file" accept=".json" required>
+                        <button class="hvr1" type="submit">Confirm</button>
+                    </form>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+</script>
+{% endblock %}
